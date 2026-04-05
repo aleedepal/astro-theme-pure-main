@@ -1,142 +1,131 @@
-{
-  /**
-   * Modified to restart every 15 seconds with theme-specific random colors.
-   */
-}
-
 <div
-  class='pointer-events-none fixed bottom-0 left-0 right-0 top-0 print:hidden'
-  style='mask-image: radial-gradient(circle, transparent, black); -webkit-mask-image: radial-gradient(circle, transparent, black);'
+  class="pointer-events-none fixed inset-0 print:hidden"
+  style="mask-image: radial-gradient(circle, transparent, black); -webkit-mask-image: radial-gradient(circle, transparent, black);"
 >
-  <canvas id='artPlumCanvas' width='400' height='400'></canvas>
+  <canvas id="artCanvas"></canvas>
 </div>
 
 <script>
-  const r180 = Math.PI
-  const r90 = Math.PI / 2
-  const r15 = Math.PI / 12
-  const MIN_BRANCH = 30
-  const len = 6
+  let artCanvas: HTMLCanvasElement | null = null;
+  let ctx: CanvasRenderingContext2D | null = null;
+  let steps: Function[] = [];
+  let prevSteps: Function[] = [];
+  let rafId: number | null = null;
 
-  // --- THEMED COLOR PALETTES ---
-  
-  // Vibrant, glowing colors for Dark Mode
-  const darkThemeColors = [
-    'hsla(180, 100%, 50%, 0.25)', // Electric Cyan
-    'hsla(280, 100%, 60%, 0.25)', // Neon Purple
-    'hsla(150, 100%, 50%, 0.25)', // Spring Green
-    'hsla(320, 100%, 60%, 0.25)', // Hot Pink
-    'hsla(200, 100%, 50%, 0.25)'  // Sky Blue
-  ]
+  const r180 = Math.PI;
+  const r90 = Math.PI / 2;
+  const r15 = Math.PI / 12;
+  const MIN_BRANCH = 30;
+  const len = 6;
 
-  // Rich, "Ink" colors for Light Mode
-  const lightThemeColors = [
-    'hsla(45, 90%, 40%, 0.35)',   // Deep Gold
-    'hsla(190, 100%, 20%, 0.25)', // Midnight Teal
-    'hsla(10, 80%, 40%, 0.25)',   // Rust Red
-    'hsla(260, 50%, 40%, 0.25)',  // Deep Grape
-    'hsla(160, 80%, 20%, 0.25)'   // Emerald Ink
-  ]
+  const darkThemeColors = ['hsla(0, 96.40%, 43.90%, 0.85)', 'hsla(0, 100.00%, 51.00%, 0.25)', 'hsla(0, 100.00%, 50.00%, 0.99)'];
+  const lightThemeColors = ['hsla(45, 90%, 40%, 0.35)', 'hsla(190, 100%, 20%, 0.25)', 'hsla(10, 80%, 40%, 0.25)'];
 
-  let currentCycleColor = ''
-  const randomMiddle = (): number => Math.random() * 0.6 + 0.2
+  const size = { width: 0, height: 0 };
 
-  interface CanvasSize { width: number; height: number }
-  interface Counter { value: number }
+  const initCanvas = () => {
+    artCanvas = document.getElementById('artCanvas') as HTMLCanvasElement;
+    if (!artCanvas) return;
+    ctx = artCanvas.getContext('2d');
+    const dpi = window.devicePixelRatio || 1;
+    size.width = window.innerWidth;
+    size.height = window.innerHeight;
 
-  const initCanvas = (canvas: HTMLCanvasElement, width = 400, height = 400) => {
-    const ctx = canvas.getContext('2d')
-    if (!ctx) throw new Error('Unable to get canvas context')
-    const dpi = window.devicePixelRatio || 1
-    canvas.style.width = `${width}px`
-    canvas.style.height = `${height}px`
-    canvas.width = dpi * width
-    canvas.height = dpi * height
-    ctx.scale(dpi, dpi)
-    return { ctx }
-  }
+    artCanvas.style.width = `${size.width}px`;
+    artCanvas.style.height = `${size.height}px`;
+    artCanvas.width = dpi * size.width;
+    artCanvas.height = dpi * size.height;
+    ctx?.scale(dpi, dpi);
+  };
 
-  const polar2cart = (x=0, y=0, r=0, theta=0): [number, number] => [x + r * Math.cos(theta), y + r * Math.sin(theta)]
+  const polar2cart = (x = 0, y = 0, r = 0, theta = 0) => [
+    x + r * Math.cos(theta),
+    y + r * Math.sin(theta)
+  ];
 
-  const canvas = document.getElementById('artPlumCanvas') as HTMLCanvasElement
-  const size: CanvasSize = { width: window.innerWidth, height: window.innerHeight }
-  let { ctx } = initCanvas(canvas, size.width, size.height)
+  const step = (x: number, y: number, rad: number, counter = { value: 0 }) => {
+    if (!ctx) return;
+    const length = Math.random() * len;
+    counter.value += 1;
+    const [nx, ny] = polar2cart(x, y, length, rad);
 
-  let steps: Array<() => void> = []
-  let prevSteps: Array<() => void> = []
-  let spawnInterval: any = null
-  let restartTimeout: any = null
+    ctx.beginPath();
+    ctx.moveTo(x, y);
+    ctx.lineTo(nx, ny);
+    ctx.stroke();
 
-  const step = (x: number, y: number, rad: number, counter: Counter = { value: 0 }): void => {
-    const length = Math.random() * len
-    counter.value += 1
-    const [nx, ny] = polar2cart(x, y, length, rad)
+    const rad1 = rad + Math.random() * r15;
+    const rad2 = rad - Math.random() * r15;
 
-    ctx.beginPath()
-    ctx.moveTo(x, y)
-    ctx.lineTo(nx, ny)
-    ctx.stroke()
+    if (nx < -100 || nx > size.width + 100 || ny < -100 || ny > size.height + 100) return;
 
-    const rad1 = rad + Math.random() * r15
-    const rad2 = rad - Math.random() * r15
-    if (nx < -100 || nx > size.width + 100 || ny < -100 || ny > size.height + 100) return
-    const rate = counter.value <= MIN_BRANCH ? 0.8 : 0.5
-    if (Math.random() < rate) steps.push(() => step(nx, ny, rad1, counter))
-    if (Math.random() < rate) steps.push(() => step(nx, ny, rad2, counter))
-  }
+    const rate = counter.value <= MIN_BRANCH ? 0.8 : 0.5;
+    if (Math.random() < rate) steps.push(() => step(nx, ny, rad1, counter));
+    if (Math.random() < rate) steps.push(() => step(nx, ny, rad2, counter));
+  };
 
-  const frame = (): void => {
-    prevSteps = steps
-    steps = []
-    if (!prevSteps.length) return
+  const frame = () => {
+    prevSteps = steps;
+    steps = [];
+    if (!prevSteps.length) return;
     prevSteps.forEach((i) => {
-      if (Math.random() < 0.5) steps.push(i)
-      else i()
-    })
-    requestAnimationFrame(frame)
-  }
+      if (Math.random() < 0.5) steps.push(i);
+      else i();
+    });
+    rafId = requestAnimationFrame(frame);
+  };
 
-  const start = (clear = false): void => {
-    if (clear) ctx.clearRect(0, 0, canvas.width, canvas.height)
-    ctx.lineWidth = 1
-    ctx.strokeStyle = currentCycleColor
-    
+  const start = () => {
+    if (!artCanvas || !ctx) return;
+    if (rafId) cancelAnimationFrame(rafId);
+
+    ctx.clearRect(0, 0, artCanvas.width, artCanvas.height);
+    steps = [];
+
+    const isDark = document.documentElement.classList.contains('dark');
+    const palette = isDark ? darkThemeColors : lightThemeColors;
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = palette[Math.floor(Math.random() * palette.length)];
+
+    const randomMiddle = () => Math.random() * 0.6 + 0.2;
     const newSeeds = [
       () => step(randomMiddle() * size.width, -5, r90),
       () => step(randomMiddle() * size.width, size.height + 5, -r90),
       () => step(-5, randomMiddle() * size.height, 0),
       () => step(size.width + 5, randomMiddle() * size.height, r180)
-    ]
-    steps.push(...(size.width < 500 ? newSeeds.slice(0, 2) : newSeeds))
-    if (prevSteps.length === 0) requestAnimationFrame(frame)
-  }
+    ];
 
-  const runCycle = () => {
-    clearInterval(spawnInterval)
-    clearTimeout(restartTimeout)
+    steps.push(...(size.width < 500 ? newSeeds.slice(0, 2) : newSeeds));
+    frame();
+  };
 
-    // Select color based on theme
-    const isDark = document.documentElement.classList.contains('dark')
-    const palette = isDark ? darkThemeColors : lightThemeColors
-    currentCycleColor = palette[Math.floor(Math.random() * palette.length)]
+  const handleResize = () => {
+    initCanvas();
+    start();
+  };
 
-    start(true)
-    spawnInterval = setInterval(() => start(false), 3000) // Spawns faster for the 15s limit
-    restartTimeout = setTimeout(() => runCycle(), 15000) // 15 Second Reset
-  }
+  // Logic to handle "Route Changes" in Astro 
+  // This works best if you are using View Transitions.
+  document.addEventListener('astro:page-load', () => {
+    initCanvas();
+    start();
+    window.addEventListener('resize', handleResize);
+  });
 
-  runCycle()
+  // Cleanup for View Transitions
+  document.addEventListener('astro:before-preparation', () => {
+    window.removeEventListener('resize', handleResize);
+    if (rafId) cancelAnimationFrame(rafId);
+  });
 
-  window.addEventListener('resize', () => {
-    if (window.innerWidth === size.width) return
-    size.width = window.innerWidth
-    size.height = window.innerHeight
-    initCanvas(canvas, size.width, size.height)
-    runCycle()
-  })
-
-  const observer = new MutationObserver((mutations) => {
-    mutations.forEach((m) => { if (m.attributeName === 'class') runCycle() })
-  })
-  observer.observe(document.documentElement, { attributes: true })
+  // Basic initialization for non-view-transition sites
+  initCanvas();
+  start();
+  window.addEventListener('resize', handleResize);
 </script>
+
+<style>
+  canvas {
+    display: block;
+  }
+</style>

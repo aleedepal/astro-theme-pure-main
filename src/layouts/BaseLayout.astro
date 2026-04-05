@@ -3,9 +3,11 @@ import { Footer, Header, ThemeProvider } from 'astro-pure/components/basic'
 import type { SiteMeta } from 'astro-pure/types'
 import BaseHead from '@/components/BaseHead.astro'
 import config from '@/site-config'
+import MusicPlayer from 'src/components/custom/MusicPlayer.astro';
 
 // Import the global.css file here so that it is included on
 // all pages through the use of the <BaseLayout /> component.
+import { ClientRouter } from 'astro:transitions';
 import '@/assets/styles/global.css'
 import '@/assets/styles/app.css'
 import BackgrounRandom from '@/components/custom/BackgrounRandom.astro'
@@ -24,8 +26,10 @@ const {
 
 <html lang={config.locale.lang}>
   <head>
+    <ClientRouter /> 
     <BaseHead {articleDate} {description} {ogImage} {title} />
     <ThemeProvider />
+
   </head>
 
   <body class='flex justify-center bg-background text-foreground' {...props}>
@@ -88,6 +92,8 @@ const {
           padding-right: calc(2.5rem + env(safe-area-inset-right));
         }
       }
+      <slot />
     </style>
+    <MusicPlayer/>
   </body>
 </html>
