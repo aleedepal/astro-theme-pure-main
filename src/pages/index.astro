@@ -10,6 +10,7 @@ import ProjectCard from '@/components/home/ProjectCard.astro'
 import Section from '@/components/home/Section.astro'
 import SkillLayout from '@/components/home/SkillLayout.astro'
 import config from '@/site-config'
+
 const languages = ['Html', 'JavaScript', 'CSS', 'Shell']
 const frontend = ['TypeScript', 'Vite', 'Webpack', 'Astro']
 const backend = ['Vercel', 'Waline']
@@ -96,90 +97,108 @@ if (!images[imagePath])
       }
 
 <style is:global>
-  /* 1. Reset Card Container */
+  /* 1. RESTORED: Horizontal Card Layout */
   .post-preview a {
     display: flex !important;
     flex-direction: column !important;
     justify-content: center !important;
     min-height: 110px !important; 
-    padding: 1rem !important;
+    padding: 1.25rem 1.5rem !important;
     background-color: #0b0909 !important;
     border: 1px solid #262626 !important;
     position: relative !important;
-    border-radius: 12px !important;
+    border-radius: 14px !important;
+    overflow: hidden !important;
     text-decoration: none !important;
   }
 
-  /* 2. Micro Tags - FIXED: removed border-radius overrides that caused circles */
-  .post-preview .tag-list {
-    display: flex !important;
-    list-style: none !important;
-    padding: 0 !important;
-    margin: 0.5rem 0 0 0 !important;
-    gap: 0.4rem !important;
-    flex-wrap: nowrap !important;
-  }
-
-  .post-preview .tag-list li {
-    margin: 0 !important;
-    padding: 0 !important;
-  }
-
-  .post-preview .tag-list a {
-    font-size: 10px !important;
-    line-height: 1 !important;
-    padding: 3px 8px !important;
-    height: auto !important;
-    min-height: unset !important;
-    background: rgba(255, 255, 255, 0.05) !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    border-radius: 4px !important; /* Forces a subtle rounded square, not a giant circle */
-    color: #888 !important;
-    display: inline-block !important;
-  }
-
-  /* 3. Big Action Arrow Positioning */
-  .post-preview .preview-redirect {
-    position: absolute !important;
-    right: 1.2rem !important;
-    top: 50% !important;
-    transform: translateY(-50%) scale(1.6) !important; 
-    stroke-width: 3px !important;
-    opacity: 0.7 !important;
-  }
-
-  /* 4. Text Safety Margins */
-  .post-preview div[style*="z-index:1"] {
-    width: 70% !important;
-    padding-right: 2rem !important;
-    z-index: 10 !important;
-  }
-
-  .post-preview .font-medium {
-    font-size: 1rem !important;
-    color: #fff !important;
-  }
-
-  .post-preview p {
-    font-size: 0.8rem !important;
-    color: #999 !important;
-    overflow: hidden !important;
-    display: -webkit-box !important;
-    -webkit-line-clamp: 1 !important;
-    -webkit-box-orient: vertical !important;
-  }
-
-  /* 5. Background Banner */
+  /* 2. RESTORED: Background Banner Image */
   .post-preview .cover-image {
     position: absolute !important;
     inset: 0 !important;
     width: 100% !important;
     height: 100% !important;
-    opacity: 0.25 !important;
+    opacity: 0.35 !important;
     z-index: 0 !important;
     object-fit: cover !important;
-    -webkit-mask-image: linear-gradient(to right, rgba(0,0,0,0) 10%, rgba(0,0,0,1) 100%) !important;
-    mask-image: linear-gradient(to right, rgba(0,0,0,0) 10%, rgba(0,0,0,1) 100%) !important;
+    pointer-events: none !important;
+    
+    /* Smooth fade to keep text readable on the left */
+    -webkit-mask-image: linear-gradient(to right, rgba(0,0,0,0) 5%, rgba(0,0,0,1) 95%) !important;
+    mask-image: linear-gradient(to right, rgba(0,0,0,0) 5%, rgba(0,0,0,1) 95%) !important;
+  }
+
+  /* 3. Text & Content Alignment */
+  .post-preview div[style*="z-index:1"] {
+    position: relative !important;
+    z-index: 10 !important;
+    width: 75% !important;
+    padding-right: 2rem !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.2rem !important;
+  }
+
+  .post-preview .font-medium {
+    font-size: 1.1rem !important;
+    font-weight: 600 !important;
+    color: #ffffff !important;
+    margin-bottom: 0.1rem !important;
+  }
+
+  .post-preview p {
+    font-size: 0.85rem !important;
+    color: #a3a3a3 !important;
+    line-clamp: 1 !important;
+    -webkit-line-clamp: 1 !important;
+  }
+
+  /* 4. FIXED: Tag List (No more giant circles) */
+  .post-preview .tag-list {
+    display: flex !important;
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 0.6rem 0 0 0 !important;
+    gap: 0.4rem !important;
+    flex-wrap: nowrap !important;
+  }
+
+  .post-preview .tag-list a {
+    font-size: 10px !important;
+    padding: 3px 10px !important;
+    background: rgba(255, 255, 255, 0.08) !important;
+    border: 1px solid rgba(255, 255, 255, 0.12) !important;
+    border-radius: 6px !important; /* Square-ish pill */
+    color: #d1d1d1 !important;
+    height: auto !important;
+    min-height: unset !important;
+    line-height: 1.2 !important;
+  }
+
+  /* 5. RESTORED: Large Bold Arrow */
+  .post-preview .preview-redirect {
+    display: block !important;
+    position: absolute !important;
+    right: 1.5rem !important;
+    top: 50% !important;
+    transform: translateY(-50%) scale(1.6) !important; 
+    stroke-width: 3.5px !important;
+    opacity: 0.7 !important;
+    transition: all 0.3s ease !important;
+  }
+
+  .post-preview:hover .preview-redirect {
+    opacity: 1 !important;
+    transform: translateY(-50%) scale(1.8) translateX(5px) !important;
+    stroke: var(--primary, #60a5fa) !important;
+  }
+
+  /* 6. Metadata (Time/Date) */
+  .post-preview time,
+  .post-preview .text-xs {
+    font-size: 0.7rem !important;
+    color: #737373 !important;
+    letter-spacing: 0.025em !important;
   }
 </style>
 
@@ -202,7 +221,7 @@ if (!images[imagePath])
             imagePath='/src/assets/projects/1.avif'
           />
           <ProjectCard
-            href='#'
+            href='/projects'
             heading='More projects'
             subheading='Check out more projects'
             imagePath='/src/assets/projects/4.avif'
