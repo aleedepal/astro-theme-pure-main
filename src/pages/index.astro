@@ -14,7 +14,8 @@ const languages = ['Html', 'JavaScript', 'CSS', 'Shell']
 const frontend = ['TypeScript', 'Vite', 'Webpack', 'Astro']
 const backend = ['Vercel', 'Waline']
 
-const MAX_POSTS = 10
+// Change MAX_POSTS to 3 for the clean home page look
+const MAX_POSTS = 3
 const allPosts = await getBlogCollection()
 const allPostsByDate = sortMDByDate(allPosts).slice(0, MAX_POSTS)
 
@@ -84,48 +85,121 @@ if (!images[imagePath])
       </Section>
       {
         allPostsByDate.length > 0 && (
-          <Section title='Posts'>
-            <ul class='flex flex-col gap-y-1.5 sm:gap-y-2'>
+          <Section title='Recent Posts'>
+            <ul class='flex flex-col gap-y-4 w-full'>
               {allPostsByDate.map((p) => (
-                <li class='flex flex-col gap-x-2 sm:flex-row'>
-                  <PostPreview post={p} />
-                </li>
+                <PostPreview post={p} detailed={true} />
               ))}
             </ul>
-            <Button title='More posts' class='w-fit self-end' href='/blog' variant='ahead' />
+            <Button title='More posts' class='w-fit self-end mt-4' href='/blog' variant='ahead' />
           </Section>
         )
       }
 
-      {
-        /* <Section title='Experience'>
-      <Card
-        heading='Lorem Ipsum'
-        subheading='Sit amet consectetur'
-        date='Dec 2022 - Nov 2023'
-        imagePath='/src/assets/about-astro.png'
-        altText='Lorem, ipsum dolor sit'
-        imageClass='h-12 w-auto md:-start-16'
-      >
-        <ul class='ms-4 list-disc text-muted-foreground'>
-          <li>
-            Lorem, ipsum dolor sit amet consectetur adipisicing elit. Dolore debitis recusandae, ut
-            molestiae laboriosam pariatur!
+<style is:global>
+  /* 1. Force a horizontal, compact card layout on all screens */
+  .post-preview a {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    min-height: 100px !important; 
+    padding: 0.75rem 1rem !important;
+    background-color: #0b0909 !important;
+    border: 1px solid #262626 !important;
+    overflow: hidden !important;
+    position: relative !important;
+  }
 
-            <li>Lorem ipsum dolor sit amet consectetur adipisicing elit. Molestiae, pariatur!</li>
-          </li>
-        </ul>
-      </Card>
-      <Card
-        heading='Lorem Ipsum'
-        subheading='Sit amet consectetur'
-        date='Dec 2022 - Nov 2023'
-        imagePath='/src/assets/about-astro.png'
-        altText='Lorem, ipsum dolor sit'
-        imageClass='h-12 w-auto md:-start-16'
-      />
-    </Section> */
-      }
+  /* 2. Fix the Image to be a horizontal background banner */
+  .post-preview .cover-image {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    opacity: 0.3 !important;
+    z-index: 0 !important;
+    object-fit: cover !important;
+    
+    -webkit-mask-image: linear-gradient(to right, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 100%) !important;
+    mask-image: linear-gradient(to right, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 100%) !important;
+  }
+
+  /* 3. Text and Content Layout */
+  .post-preview div[style*="z-index:1"] {
+    position: relative !important;
+    z-index: 10 !important;
+    width: 75% !important; 
+    padding-right: 2rem !important;
+    gap: 0.1rem !important;
+  }
+
+  .post-preview .font-medium {
+    font-size: 0.95rem !important;
+    line-height: 1.2 !important;
+    color: #fff !important;
+  }
+
+  .post-preview p {
+    font-size: 0.75rem !important;
+    color: #a3a3a3 !important;
+    margin-top: 0.1rem !important;
+    line-clamp: 1 !important;
+    -webkit-line-clamp: 1 !important;
+  }
+
+  /* 4. Micro Tags Styling */
+  .post-preview .tag-list {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow: hidden !important;
+    gap: 0.35rem !important;
+    margin-top: 0.3rem !important;
+  }
+
+  .post-preview .tag-list a {
+    font-size: 0.6rem !important;
+    padding: 0.1rem 0.4rem !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    height: 1.25rem !important;
+    color: #888 !important;
+    border-radius: 99px !important;
+    line-height: 1 !important;
+  }
+
+  /* 5. Ultra-Bold Redirect Arrow */
+  .post-preview .preview-redirect {
+    display: block !important;
+    position: absolute !important;
+    right: 1rem !important;
+    top: 50% !important;
+    transform: translateY(-50%) scale(1.6) !important; 
+    opacity: 0.7 !important;
+    stroke-width: 3px !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    z-index: 20 !important;
+  }
+
+  .post-preview:hover .preview-redirect {
+    opacity: 1 !important;
+    transform: translateY(-50%) scale(1.8) translateX(4px) !important;
+    stroke: var(--primary) !important;
+  }
+
+  .post-preview .preview-redirect polyline,
+  .post-preview .preview-redirect line {
+    stroke: #ffffff !important;
+  }
+
+  /* 6. Metadata Styling */
+  .post-preview time,
+  .post-preview .text-xs,
+  .post-preview .italic {
+    font-size: 0.65rem !important;
+    color: #888 !important;
+  }
+</style>
+
       <Section title='Education'>
         <Card
           as='a'
@@ -133,17 +207,7 @@ if (!images[imagePath])
           subheading='Lorem ipsum dolor sit amet, vidit suscipit at mei.'
           date='August 2021 - July 2025'
           href='https://www.youtube.com/watch?v=dQw4w9WgXcQ'
-        >
-          {
-            /* <ul class='ms-4 list-disc text-muted-foreground'>
-          <li>
-            Lorem, ipsum dolor sit amet consectetur adipisicing elit. Dolore debitis recusandae, ut
-            molestiae laboriosam pariatur!
-          </li>
-          <li>Lorem ipsum dolor sit amet consectetur adipisicing elit. Molestiae, pariatur!</li>
-        </ul> */
-          }
-        </Card>
+        />
       </Section>
 
       <Section title='Website List'>
@@ -179,7 +243,7 @@ if (!images[imagePath])
         <Card
           as='a'
           heading='Lorem ipsum'
-          subheading='Lorem ipsum dolor sit amet, vidit suscipit at mei. Quem denique mea id. Usu ei regione indoctum dissentiunt, cu meliore fuisset mei, vel quod voluptua ne. Ex dicat impedit mel, at eum oratio possit voluptatum. Dicat ceteros cu vim. Impetus fuisset ullamcorper pri cu, his posse iisque ad, aliquam honestatis usu id.'
+          subheading='Lorem ipsum dolor sit amet, vidit suscipit at mei...'
           date='July 2024'
           href='https://www.youtube.com/watch?v=dQw4w9WgXcQ'
         />
