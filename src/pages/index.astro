@@ -102,20 +102,21 @@ if (!images[imagePath])
     display: flex !important;
     flex-direction: column !important;
     justify-content: center !important;
-    min-height: 100px !important; /* Matches the small vertical height in your screenshot */
-    padding: 0.75rem 1rem !important;
+    min-height: 110px !important; 
+    padding: 0.8rem 1.2rem !important;
     background-color: #0b0909 !important;
     border: 1px solid #262626 !important;
     overflow: hidden !important;
+    position: relative !important;
   }
   
-  /* FIXED TAGS: Forced micro-rectangle style to stop them becoming circles */
+  /* FIXED TAGS: Forced micro-rectangle style */
   .post-preview .tag-list {
     display: flex !important;
     flex-wrap: nowrap !important;
     overflow: hidden !important;
     gap: 0.3rem !important;
-    margin-top: 0.4rem !important;
+    margin-top: 0.5rem !important;
     list-style: none !important;
     padding: 0 !important;
   }
@@ -133,8 +134,8 @@ if (!images[imagePath])
     height: auto !important;
     min-height: unset !important;
     width: auto !important;
-    aspect-ratio: auto !important; /* Prevents them being forced into a circle shape */
-    border-radius: 4px !important; /* Subtle rounded corner, NOT a circle */
+    aspect-ratio: auto !important; 
+    border-radius: 4px !important;
     line-height: 1 !important;
     display: inline-block !important;
   }
@@ -143,12 +144,11 @@ if (!images[imagePath])
   .post-preview .preview-redirect {
     display: block !important;
     position: absolute !important;
-    right: 1rem !important; /* Moved closer to the edge */
+    right: 1.2rem !important; 
     top: 50% !important;
-    /* Scale(1.6) makes it nearly double the original size */
     transform: translateY(-50%) scale(1.6) !important; 
     opacity: 0.7 !important;
-    stroke-width: 3px !important; /* Makes the arrow lines thicker/bolder */
+    stroke-width: 3.5px !important; 
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
     z-index: 20 !important;
   }
@@ -162,64 +162,66 @@ if (!images[imagePath])
 
   /* 3. Safety Margin for Text */
   .post-preview div[style*="z-index:1"] {
-    /* Increased padding to ensure text never touches the massive arrow */
-    padding-right: 3.5rem !important; 
+    padding-right: 3.8rem !important; 
   }
 
-  /* 4. Optional: Force the arrow color to be white/bright by default */
+  /* 4. Arrow color */
   .post-preview .preview-redirect polyline,
   .post-preview .preview-redirect line {
     stroke: #ffffff !important;
   }
 
-  /* 2. Fix the Image to be a horizontal background banner on mobile */
+  /* 2. Fix the Image background */
   .post-preview .cover-image {
     position: absolute !important;
     inset: 0 !important;
     width: 100% !important;
     height: 100% !important;
-    opacity: 0.3 !important;
+    opacity: 0.25 !important;
     z-index: 0 !important;
     object-fit: cover !important;
-    
-    /* Horizontal mask: fades image from left to right */
     -webkit-mask-image: linear-gradient(to right, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 100%) !important;
     mask-image: linear-gradient(to right, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 100%) !important;
   }
 
-  /* 3. Ensure the text content doesn't shift or grow too large */
+  /* 3. Text content width */
   .post-preview div[style*="z-index:1"] {
     position: relative !important;
     z-index: 10 !important;
-    width: 70% !important; /* Keeps text on the left to avoid the solid part of the banner */
-    gap: 0.1rem !important;
+    width: 75% !important; 
+    gap: 0.15rem !important;
   }
 
-  /* 4. Shrink text elements to fit the compact horizontal style */
+  /* 4. Shrink text elements */
   .post-preview .font-medium {
-    font-size: 0.95rem !important; /* Smaller title */
+    font-size: 1rem !important; 
     line-height: 1.2 !important;
   }
 
+  /* 1.5 - 2 LINE CLAMP: Limits description so style isn't ruined */
   .post-preview p {
-    font-size: 0.75rem !important; /* Smaller description */
-    margin-top: 0.1rem !important;
-    line-clamp: 1 !important; /* Limits description to one line for compactness */
-    -webkit-line-clamp: 1 !important;
+    font-size: 0.78rem !important; 
+    margin-top: 0.2rem !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important; 
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+    line-height: 1.4 !important;
+    color: #a1a1aa !important;
   }
 
-  /* 5. Metadata (Time, Language, Date) styling */
+  /* 5. Metadata styling */
   .post-preview time,
   .post-preview .text-xs,
   .post-preview .italic {
     font-size: 0.65rem !important;
-    color: #888 !important;
+    color: #71717a !important;
   }
 
-  /* 7. Position the arrow icon on the far right */
+  /* Arrow icon positioning */
   .preview-redirect {
     position: absolute !important;
-    right: 0.75rem !important;
+    right: 0.8rem !important;
     top: 50% !important;
     transform: translateY(-50%) !important;
     width: 14px !important;
