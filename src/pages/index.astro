@@ -10,12 +10,11 @@ import ProjectCard from '@/components/home/ProjectCard.astro'
 import Section from '@/components/home/Section.astro'
 import SkillLayout from '@/components/home/SkillLayout.astro'
 import config from '@/site-config'
-
 const languages = ['Html', 'JavaScript', 'CSS', 'Shell']
 const frontend = ['TypeScript', 'Vite', 'Webpack', 'Astro']
 const backend = ['Vercel', 'Waline']
 
-const MAX_POSTS = 3
+const MAX_POSTS = 4
 const allPosts = await getBlogCollection()
 const allPostsByDate = sortMDByDate(allPosts).slice(0, MAX_POSTS)
 
@@ -57,6 +56,7 @@ if (!images[imagePath])
         </div>
       </div>
 
+      {/* Get template */}
       <a
         href='https://x.com/aleedepal/'
         target='_blank'
@@ -82,143 +82,219 @@ if (!images[imagePath])
         </p>
         <Button title='More about me' class='w-fit self-end' href='/about' variant='ahead' />
       </Section>
-
       {
         allPostsByDate.length > 0 && (
-          <Section title='Recent Posts'>
-            <ul class='flex flex-col gap-y-4 w-full'>
+          <Section title='Posts'>
+            {/* Added the 'force-desktop-preview' class here */}
+            <ul class='force-desktop-preview flex flex-col gap-y-4 w-full'>
               {allPostsByDate.map((p) => (
                 <PostPreview post={p} detailed={true} />
               ))}
             </ul>
-            <Button title='More posts' class='w-fit self-end mt-4' href='/blog' variant='ahead' />
+            <Button title='More posts' class='w-fit self-end' href='/blog' variant='ahead' />
           </Section>
         )
       }
 
 <style is:global>
-  /* 1. RESTORED: Horizontal Card Layout */
+  /* 1. Force a horizontal, compact card layout on all screens */
   .post-preview a {
     display: flex !important;
     flex-direction: column !important;
     justify-content: center !important;
-    min-height: 110px !important; 
-    padding: 1.25rem 1.5rem !important;
+    min-height: 100px !important; /* Matches the small vertical height in your screenshot */
+    padding: 0.75rem 1rem !important;
     background-color: #0b0909 !important;
     border: 1px solid #262626 !important;
-    position: relative !important;
-    border-radius: 14px !important;
     overflow: hidden !important;
-    text-decoration: none !important;
+  }
+  
+  /* FIXED TAGS: Forced micro-rectangle style to stop them becoming circles */
+  .post-preview .tag-list {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow: hidden !important;
+    gap: 0.3rem !important;
+    margin-top: 0.4rem !important;
+    list-style: none !important;
+    padding: 0 !important;
   }
 
-  /* 2. RESTORED: Background Banner Image */
+  .post-preview .tag-list li {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .post-preview .tag-list li a {
+    font-size: 0.6rem !important;
+    padding: 2px 6px !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    height: auto !important;
+    min-height: unset !important;
+    width: auto !important;
+    aspect-ratio: auto !important; /* Prevents them being forced into a circle shape */
+    border-radius: 4px !important; /* Subtle rounded corner, NOT a circle */
+    line-height: 1 !important;
+    display: inline-block !important;
+  }
+
+  /* 1. Ultra-Bold Redirect Arrow */
+  .post-preview .preview-redirect {
+    display: block !important;
+    position: absolute !important;
+    right: 1rem !important; /* Moved closer to the edge */
+    top: 50% !important;
+    /* Scale(1.6) makes it nearly double the original size */
+    transform: translateY(-50%) scale(1.6) !important; 
+    opacity: 0.7 !important;
+    stroke-width: 3px !important; /* Makes the arrow lines thicker/bolder */
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    z-index: 20 !important;
+  }
+
+  /* 2. Hover Interaction */
+  .post-preview:hover .preview-redirect {
+    opacity: 1 !important;
+    transform: translateY(-50%) scale(1.8) translateX(4px) !important;
+    stroke: var(--primary) !important;
+  }
+
+  /* 3. Safety Margin for Text */
+  .post-preview div[style*="z-index:1"] {
+    /* Increased padding to ensure text never touches the massive arrow */
+    padding-right: 3.5rem !important; 
+  }
+
+  /* 4. Optional: Force the arrow color to be white/bright by default */
+  .post-preview .preview-redirect polyline,
+  .post-preview .preview-redirect line {
+    stroke: #ffffff !important;
+  }
+
+  /* 2. Fix the Image to be a horizontal background banner on mobile */
   .post-preview .cover-image {
     position: absolute !important;
     inset: 0 !important;
     width: 100% !important;
     height: 100% !important;
-    opacity: 0.35 !important;
+    opacity: 0.3 !important;
     z-index: 0 !important;
     object-fit: cover !important;
-    pointer-events: none !important;
     
-    /* Smooth fade to keep text readable on the left */
-    -webkit-mask-image: linear-gradient(to right, rgba(0,0,0,0) 5%, rgba(0,0,0,1) 95%) !important;
-    mask-image: linear-gradient(to right, rgba(0,0,0,0) 5%, rgba(0,0,0,1) 95%) !important;
+    /* Horizontal mask: fades image from left to right */
+    -webkit-mask-image: linear-gradient(to right, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 100%) !important;
+    mask-image: linear-gradient(to right, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 100%) !important;
   }
 
-  /* 3. Text & Content Alignment */
+  /* 3. Ensure the text content doesn't shift or grow too large */
   .post-preview div[style*="z-index:1"] {
     position: relative !important;
     z-index: 10 !important;
-    width: 75% !important;
-    padding-right: 2rem !important;
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 0.2rem !important;
+    width: 70% !important; /* Keeps text on the left to avoid the solid part of the banner */
+    gap: 0.1rem !important;
   }
 
+  /* 4. Shrink text elements to fit the compact horizontal style */
   .post-preview .font-medium {
-    font-size: 1.1rem !important;
-    font-weight: 600 !important;
-    color: #ffffff !important;
-    margin-bottom: 0.1rem !important;
-  }
-
-  .post-preview p {
-    font-size: 0.85rem !important;
-    color: #a3a3a3 !important;
-    line-clamp: 1 !important;
-    -webkit-line-clamp: 1 !important;
-  }
-
-  /* 4. FIXED: Tag List (No more giant circles) */
-  .post-preview .tag-list {
-    display: flex !important;
-    list-style: none !important;
-    padding: 0 !important;
-    margin: 0.6rem 0 0 0 !important;
-    gap: 0.4rem !important;
-    flex-wrap: nowrap !important;
-  }
-
-  .post-preview .tag-list a {
-    font-size: 10px !important;
-    padding: 3px 10px !important;
-    background: rgba(255, 255, 255, 0.08) !important;
-    border: 1px solid rgba(255, 255, 255, 0.12) !important;
-    border-radius: 6px !important; /* Square-ish pill */
-    color: #d1d1d1 !important;
-    height: auto !important;
-    min-height: unset !important;
+    font-size: 0.95rem !important; /* Smaller title */
     line-height: 1.2 !important;
   }
 
-  /* 5. RESTORED: Large Bold Arrow */
-  .post-preview .preview-redirect {
-    display: block !important;
-    position: absolute !important;
-    right: 1.5rem !important;
-    top: 50% !important;
-    transform: translateY(-50%) scale(1.6) !important; 
-    stroke-width: 3.5px !important;
-    opacity: 0.7 !important;
-    transition: all 0.3s ease !important;
+  .post-preview p {
+    font-size: 0.75rem !important; /* Smaller description */
+    margin-top: 0.1rem !important;
+    line-clamp: 1 !important; /* Limits description to one line for compactness */
+    -webkit-line-clamp: 1 !important;
   }
 
-  .post-preview:hover .preview-redirect {
-    opacity: 1 !important;
-    transform: translateY(-50%) scale(1.8) translateX(5px) !important;
-    stroke: var(--primary, #60a5fa) !important;
-  }
-
-  /* 6. Metadata (Time/Date) */
+  /* 5. Metadata (Time, Language, Date) styling */
   .post-preview time,
-  .post-preview .text-xs {
-    font-size: 0.7rem !important;
-    color: #737373 !important;
-    letter-spacing: 0.025em !important;
+  .post-preview .text-xs,
+  .post-preview .italic {
+    font-size: 0.65rem !important;
+    color: #888 !important;
+  }
+
+  /* 7. Position the arrow icon on the far right */
+  .preview-redirect {
+    position: absolute !important;
+    right: 0.75rem !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    width: 14px !important;
+    height: 14px !important;
   }
 </style>
 
+      {
+        /* <Section title='Experience'>
+      <Card
+        heading='Lorem Ipsum'
+        subheading='Sit amet consectetur'
+        date='Dec 2022 - Nov 2023'
+        imagePath='/src/assets/about-astro.png'
+        altText='Lorem, ipsum dolor sit'
+        imageClass='h-12 w-auto md:-start-16'
+      >
+        <ul class='ms-4 list-disc text-muted-foreground'>
+          <li>
+            Lorem, ipsum dolor sit amet consectetur adipisicing elit. Dolore debitis recusandae, ut
+            molestiae laboriosam pariatur!
+
+            <li>Lorem ipsum dolor sit amet consectetur adipisicing elit. Molestiae, pariatur!</li>
+          </li>
+        </ul>
+      </Card>
+      <Card
+        heading='Lorem Ipsum'
+        subheading='Sit amet consectetur'
+        date='Dec 2022 - Nov 2023'
+        imagePath='/src/assets/about-astro.png'
+        altText='Lorem, ipsum dolor sit'
+        imageClass='h-12 w-auto md:-start-16'
+      />
+    </Section> */
+      }
       <Section title='Education'>
         <Card
           as='a'
           heading='Lorem ipsum'
           subheading='Lorem ipsum dolor sit amet, vidit suscipit at mei.'
           date='August 2021 - July 2025'
-          href='#'
-        />
+          href='https://www.youtube.com/watch?v=dQw4w9WgXcQ'
+        >
+          {
+            /* <ul class='ms-4 list-disc text-muted-foreground'>
+          <li>
+            Lorem, ipsum dolor sit amet consectetur adipisicing elit. Dolore debitis recusandae, ut
+            molestiae laboriosam pariatur!
+          </li>
+          <li>Lorem ipsum dolor sit amet consectetur adipisicing elit. Molestiae, pariatur!</li>
+        </ul> */
+          }
+        </Card>
       </Section>
 
       <Section title='Website List'>
         <div class='grid grid-cols-1 gap-3 sm:grid-cols-2'>
           <ProjectCard
-            href='#'
+            href='https://www.youtube.com/watch?v=dQw4w9WgXcQ'
             heading='Lorem ipsum'
             subheading='Do not go gentle into that good night'
             imagePath='/src/assets/projects/1.avif'
+          />
+          <ProjectCard
+            href='https://www.youtube.com/watch?v=dQw4w9WgXcQ'
+            heading='Lorem ipsum'
+            subheading='Old age burn and rave at close of day'
+            imagePath='/src/assets/projects/2.avif'
+          />
+          <ProjectCard
+            href='https://www.youtube.com/watch?v=dQw4w9WgXcQ'
+            heading='Lorem ipsum'
+            subheading='Rage, rage against the dying of the light'
+            imagePath='/src/assets/projects/3.avif'
           />
           <ProjectCard
             href='/projects'
@@ -227,6 +303,16 @@ if (!images[imagePath])
             imagePath='/src/assets/projects/4.avif'
           />
         </div>
+      </Section>
+
+      <Section title='Certifications'>
+        <Card
+          as='a'
+          heading='Lorem ipsum'
+          subheading='Lorem ipsum dolor sit amet, vidit suscipit at mei. Quem denique mea id. Usu ei regione indoctum dissentiunt, cu meliore fuisset mei, vel quod voluptua ne. Ex dicat impedit mel, at eum oratio possit voluptatum. Dicat ceteros cu vim. Impetus fuisset ullamcorper pri cu, his posse iisque ad, aliquam honestatis usu id.'
+          date='July 2024'
+          href='https://www.youtube.com/watch?v=dQw4w9WgXcQ'
+        />
       </Section>
 
       <Section title='Skills'>
