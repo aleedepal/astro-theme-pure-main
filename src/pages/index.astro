@@ -14,7 +14,6 @@ const languages = ['Html', 'JavaScript', 'CSS', 'Shell']
 const frontend = ['TypeScript', 'Vite', 'Webpack', 'Astro']
 const backend = ['Vercel', 'Waline']
 
-// Change MAX_POSTS to 3 for the clean home page look
 const MAX_POSTS = 3
 const allPosts = await getBlogCollection()
 const allPostsByDate = sortMDByDate(allPosts).slice(0, MAX_POSTS)
@@ -57,7 +56,6 @@ if (!images[imagePath])
         </div>
       </div>
 
-      {/* Get template */}
       <a
         href='https://x.com/aleedepal/'
         target='_blank'
@@ -83,6 +81,7 @@ if (!images[imagePath])
         </p>
         <Button title='More about me' class='w-fit self-end' href='/about' variant='ahead' />
       </Section>
+
       {
         allPostsByDate.length > 0 && (
           <Section title='Recent Posts'>
@@ -97,106 +96,90 @@ if (!images[imagePath])
       }
 
 <style is:global>
-  /* 1. Force a horizontal, compact card layout on all screens */
+  /* 1. Reset Card Container */
   .post-preview a {
     display: flex !important;
     flex-direction: column !important;
     justify-content: center !important;
-    min-height: 100px !important; 
-    padding: 0.75rem 1rem !important;
+    min-height: 110px !important; 
+    padding: 1rem !important;
     background-color: #0b0909 !important;
     border: 1px solid #262626 !important;
-    overflow: hidden !important;
     position: relative !important;
+    border-radius: 12px !important;
+    text-decoration: none !important;
   }
 
-  /* 2. Fix the Image to be a horizontal background banner */
+  /* 2. Micro Tags - FIXED: removed border-radius overrides that caused circles */
+  .post-preview .tag-list {
+    display: flex !important;
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 0.5rem 0 0 0 !important;
+    gap: 0.4rem !important;
+    flex-wrap: nowrap !important;
+  }
+
+  .post-preview .tag-list li {
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .post-preview .tag-list a {
+    font-size: 10px !important;
+    line-height: 1 !important;
+    padding: 3px 8px !important;
+    height: auto !important;
+    min-height: unset !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 4px !important; /* Forces a subtle rounded square, not a giant circle */
+    color: #888 !important;
+    display: inline-block !important;
+  }
+
+  /* 3. Big Action Arrow Positioning */
+  .post-preview .preview-redirect {
+    position: absolute !important;
+    right: 1.2rem !important;
+    top: 50% !important;
+    transform: translateY(-50%) scale(1.6) !important; 
+    stroke-width: 3px !important;
+    opacity: 0.7 !important;
+  }
+
+  /* 4. Text Safety Margins */
+  .post-preview div[style*="z-index:1"] {
+    width: 70% !important;
+    padding-right: 2rem !important;
+    z-index: 10 !important;
+  }
+
+  .post-preview .font-medium {
+    font-size: 1rem !important;
+    color: #fff !important;
+  }
+
+  .post-preview p {
+    font-size: 0.8rem !important;
+    color: #999 !important;
+    overflow: hidden !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 1 !important;
+    -webkit-box-orient: vertical !important;
+  }
+
+  /* 5. Background Banner */
   .post-preview .cover-image {
     position: absolute !important;
     inset: 0 !important;
     width: 100% !important;
     height: 100% !important;
-    opacity: 0.3 !important;
+    opacity: 0.25 !important;
     z-index: 0 !important;
     object-fit: cover !important;
-    
-    -webkit-mask-image: linear-gradient(to right, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 100%) !important;
-    mask-image: linear-gradient(to right, rgba(0,0,0,0) 0%, rgba(0,0,0,1) 100%) !important;
-  }
-
-  /* 3. Text and Content Layout */
-  .post-preview div[style*="z-index:1"] {
-    position: relative !important;
-    z-index: 10 !important;
-    width: 75% !important; 
-    padding-right: 2rem !important;
-    gap: 0.1rem !important;
-  }
-
-  .post-preview .font-medium {
-    font-size: 0.95rem !important;
-    line-height: 1.2 !important;
-    color: #fff !important;
-  }
-
-  .post-preview p {
-    font-size: 0.75rem !important;
-    color: #a3a3a3 !important;
-    margin-top: 0.1rem !important;
-    line-clamp: 1 !important;
-    -webkit-line-clamp: 1 !important;
-  }
-
-  /* 4. Micro Tags Styling */
-  .post-preview .tag-list {
-    display: flex !important;
-    flex-wrap: nowrap !important;
-    overflow: hidden !important;
-    gap: 0.35rem !important;
-    margin-top: 0.3rem !important;
-  }
-
-  .post-preview .tag-list a {
-    font-size: 0.6rem !important;
-    padding: 0.1rem 0.4rem !important;
-    background: rgba(255, 255, 255, 0.05) !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    height: 1.25rem !important;
-    color: #888 !important;
-    border-radius: 99px !important;
-    line-height: 1 !important;
-  }
-
-  /* 5. Ultra-Bold Redirect Arrow */
-  .post-preview .preview-redirect {
-    display: block !important;
-    position: absolute !important;
-    right: 1rem !important;
-    top: 50% !important;
-    transform: translateY(-50%) scale(1.6) !important; 
-    opacity: 0.7 !important;
-    stroke-width: 3px !important;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-    z-index: 20 !important;
-  }
-
-  .post-preview:hover .preview-redirect {
-    opacity: 1 !important;
-    transform: translateY(-50%) scale(1.8) translateX(4px) !important;
-    stroke: var(--primary) !important;
-  }
-
-  .post-preview .preview-redirect polyline,
-  .post-preview .preview-redirect line {
-    stroke: #ffffff !important;
-  }
-
-  /* 6. Metadata Styling */
-  .post-preview time,
-  .post-preview .text-xs,
-  .post-preview .italic {
-    font-size: 0.65rem !important;
-    color: #888 !important;
+    -webkit-mask-image: linear-gradient(to right, rgba(0,0,0,0) 10%, rgba(0,0,0,1) 100%) !important;
+    mask-image: linear-gradient(to right, rgba(0,0,0,0) 10%, rgba(0,0,0,1) 100%) !important;
   }
 </style>
 
@@ -206,47 +189,25 @@ if (!images[imagePath])
           heading='Lorem ipsum'
           subheading='Lorem ipsum dolor sit amet, vidit suscipit at mei.'
           date='August 2021 - July 2025'
-          href='https://www.youtube.com/watch?v=dQw4w9WgXcQ'
+          href='#'
         />
       </Section>
 
       <Section title='Website List'>
         <div class='grid grid-cols-1 gap-3 sm:grid-cols-2'>
           <ProjectCard
-            href='https://www.youtube.com/watch?v=dQw4w9WgXcQ'
+            href='#'
             heading='Lorem ipsum'
             subheading='Do not go gentle into that good night'
             imagePath='/src/assets/projects/1.avif'
           />
           <ProjectCard
-            href='https://www.youtube.com/watch?v=dQw4w9WgXcQ'
-            heading='Lorem ipsum'
-            subheading='Old age burn and rave at close of day'
-            imagePath='/src/assets/projects/2.avif'
-          />
-          <ProjectCard
-            href='https://www.youtube.com/watch?v=dQw4w9WgXcQ'
-            heading='Lorem ipsum'
-            subheading='Rage, rage against the dying of the light'
-            imagePath='/src/assets/projects/3.avif'
-          />
-          <ProjectCard
-            href='/projects'
+            href='#'
             heading='More projects'
             subheading='Check out more projects'
             imagePath='/src/assets/projects/4.avif'
           />
         </div>
-      </Section>
-
-      <Section title='Certifications'>
-        <Card
-          as='a'
-          heading='Lorem ipsum'
-          subheading='Lorem ipsum dolor sit amet, vidit suscipit at mei...'
-          date='July 2024'
-          href='https://www.youtube.com/watch?v=dQw4w9WgXcQ'
-        />
       </Section>
 
       <Section title='Skills'>
